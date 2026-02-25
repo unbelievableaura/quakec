@@ -481,19 +481,7 @@ void(string contract_address) Menu_CopyContractAddress =
 void() Menu_DrawBuildDate =
 {
 	sui_set_align([SUI_ALIGN_END, SUI_ALIGN_START]);
-	string contract_label = strcat("CA: ", menu_test_contract_address);
-	float contract_hovered = sui_is_hovered("mm_contract_copy");
-	vector contract_color = contract_hovered ? [1, 0.8, 0.2] : [1, 1, 1];
-	float contract_width = getTextWidth(contract_label, MENU_TEXT_SMALL_x);
-
-	sui_text([-6, 8], MENU_TEXT_SMALL, contract_label, contract_color, 1, 0);
-	sui_action_element([-6 - contract_width, 6], [contract_width + 6, 14], "mm_contract_copy", sui_noop);
-
-	if (sui_is_clicked("mm_contract_copy")) {
-		Menu_CopyContractAddress(menu_test_contract_address);
-	}
-
-	sui_text([-6, 22], MENU_TEXT_SMALL, sprintf("Welcome, %s", cvar_string("name")), [1, 1, 0], 1, 0);
+	sui_text([-6, 8], MENU_TEXT_SMALL, sprintf("Welcome, %s", cvar_string("name")), [1, 1, 0], 1, 0);
 };
 
 //
@@ -547,6 +535,10 @@ void() Menu_DrawBackground =
 	// Bottom Bars
 	sui_fill([0, sui_current_frame_size()[1] - 55], [sui_current_frame_size()[0], 55], [0, 0, 0], 0.9, 0);
 	sui_fill([0, sui_current_frame_size()[1] - 58], [sui_current_frame_size()[0], 3], [0.2, 0.2, 0.2], 1, 0);
+
+	// Default footer info shown where hover descriptions appear.
+	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_END]);
+	sui_text([0, -30], MENU_TEXT_MEDIUM, strcat("CA: ", menu_test_contract_address), [1, 1, 1], 1, 0);
 };
 
 //
