@@ -79,6 +79,10 @@ void() Menu_Pause_No =
 
 void() Menu_Pause =
 {
+    // Guard against corrupted/unknown submenu values leaving a blank dark panel.
+    if (menu_paus_submenu != 0 && menu_paus_submenu != 1 && menu_paus_submenu != 2)
+        menu_paus_submenu = 0;
+
     Menu_DrawBackground();
     Menu_DrawTitle("PAUSED");
 

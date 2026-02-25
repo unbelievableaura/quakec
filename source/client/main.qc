@@ -209,6 +209,7 @@ void() ToggleMenu =
 
 		if(current_menu == MENU_NONE)
 		{
+			menu_paus_submenu = 0;
 			current_menu = MENU_PAUSE;
 			setcursormode(TRUE, cvar_string("cl_cursor"), __NULL__, cvar("cl_cursor_scale"));
 		}
