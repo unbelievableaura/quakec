@@ -3,6 +3,20 @@ string menu_maps_buttons[13];
 
 float menu_maps_init;
 
+float(string bsp_name) Menu_Maps_IsSoloBlockedMap =
+{
+    if (bsp_name == "nzp_warehouse2")
+        return true;
+
+    if (bsp_name == "nzp_warehouse")
+        return true;
+
+    if (bsp_name == "nzp_xmas2")
+        return true;
+
+    return false;
+};
+
 //
 // Menu_Maps_Init()
 // Array lookup optimization that stores
@@ -132,50 +146,92 @@ void() Menu_Maps =
 
     // Stock Maps
     if (menu_map_mode == MAP_SOLOSTOCK || menu_map_mode == MAP_COOPSTOCK) {
-        int blank_map_spots = 0;
+        int visible_stock_count = 0;
 
         for(i = 0; i < stock_maps.length; i++) {
             if (stock_maps[i].bsp_name == "") {
-                blank_map_spots++;
-                Menu_DrawDivider(i + 1.25);
+                Menu_DrawDivider(visible_stock_count + 1.25);
+                continue;
+            }
+
+            if (menu_map_mode == MAP_SOLOSTOCK && Menu_Maps_IsSoloBlockedMap(stock_maps[i].bsp_name)) {
                 continue;
             }
 
             // Build the map strings
-            menu_maps_buttons[i - blank_map_spots] = sprintf("map_%s", stock_maps[i].bsp_name);
+            menu_maps_buttons[visible_stock_count] = sprintf("map_%s", stock_maps[i].bsp_name);
 
-            Menu_MapButton(i + 1, sprintf("map_%s", stock_maps[i].bsp_name), stock_maps[i].bsp_name, stock_maps[i].map_category, -1) ? Menu_Maps_LoadMap(stock_maps[i].bsp_name) : 0;
+            Menu_MapButton(visible_stock_count + 1, sprintf("map_%s", stock_maps[i].bsp_name), stock_maps[i].bsp_name, stock_maps[i].map_category, -1) ? Menu_Maps_LoadMap(stock_maps[i].bsp_name) : 0;
+            visible_stock_count++;
         }
-        Menu_DrawDivider(i + 1.25);
+        Menu_DrawDivider(visible_stock_count + 1.25);
 
 		if (menu_map_mode == MAP_SOLOSTOCK) {
-			Menu_Button(i + 1.5, "map_nzpusermaps", "USER MAPS", "View User-Created Maps.") ? current_menu = MENU_SOLOUSER : 0;
+			Menu_Button(visible_stock_count + 1.5, "map_nzpusermaps", "USER MAPS", "View User-Created Maps.") ? current_menu = MENU_SOLOUSER : 0;
 		} else if (menu_map_mode == MAP_COOPSTOCK) {
-			Menu_Button(i + 1.5, "map_nzpusermaps", "USER MAPS", "View User-Created Maps.") ? current_menu = MENU_COOPUSER : 0;
+			Menu_Button(visible_stock_count + 1.5, "map_nzpusermaps", "USER MAPS", "View User-Created Maps.") ? current_menu = MENU_COOPUSER : 0;
 		}
 
-        if (Menu_Button(i + 2.5, "map_randommap", "RANDOM", "Feeling indecisive? Try rolling the dice."))
+        if (Menu_Button(visible_stock_count + 2.5, "map_randommap", "RANDOM", "Feeling indecisive? Try rolling the dice."))
         {
-            int random_map_index = rint(random() * user_maps_count);
-            Menu_Maps_LoadMap(user_maps[random_map_index].map_name);
+            int random_candidate_indices[USER_MAPS_MAX];
+            int random_candidate_count = 0;
+
+            for(int random_i = 0; random_i < user_maps_count; random_i++) {
+                if (menu_map_mode == MAP_SOLOSTOCK && Menu_Maps_IsSoloBlockedMap(user_maps[random_i].map_name))
+                    continue;
+
+                random_candidate_indices[random_candidate_count] = random_i;
+                random_candidate_count++;
+            }
+
+            if (random_candidate_count > 0) {
+                int random_candidate_pick = rint(random() * (random_candidate_count - 1));
+                int random_map_index = random_candidate_indices[random_candidate_pick];
+                Menu_Maps_LoadMap(user_maps[random_map_index].map_name);
+            } else {
+                Menu_PlaySound(MENU_SND_BEEP);
+            }
         }
 
         // Usermaps and back button registry
-        menu_maps_buttons[i] = "map_nzpusermaps";
-        menu_maps_buttons[i + 1] = "map_randommap";
-        menu_maps_buttons[i + 2] = "map_back";
+        menu_maps_buttons[visible_stock_count] = "map_nzpusermaps";
+        menu_maps_buttons[visible_stock_count + 1] = "map_randommap";
+        menu_maps_buttons[visible_stock_count + 2] = "map_back";
     } else {
+        int filtered_user_map_indices[USER_MAPS_MAX];
+        int filtered_user_map_count = 0;
+
+        for (i = 0; i < user_maps_count; i++) {
+            if (menu_map_mode == MAP_SOLOUSER && Menu_Maps_IsSoloBlockedMap(user_maps[i].map_name))
+                continue;
+
+            filtered_user_map_indices[filtered_user_map_count] = i;
+            filtered_user_map_count++;
+        }
+
+        if (user_maps_page < 0)
+            user_maps_page = 0;
+
+        int max_user_map_page = 0;
+        if (filtered_user_map_count > 0)
+            max_user_map_page = floor((filtered_user_map_count - 1) / 10);
+
+        if (user_maps_page > max_user_map_page)
+            user_maps_page = max_user_map_page;
+
         // calculate the amount of usermaps we can display on this page.
         int maps_on_page = 10; // default to 10, all that will fit on the UI.
         int maps_start_position = (user_maps_page * 10);
 
         // Not all 10 slots can be filled..
-        if (maps_on_page > user_maps_count - maps_start_position)
-            maps_on_page = user_maps_count - maps_start_position;
+        if (maps_on_page > filtered_user_map_count - maps_start_position)
+            maps_on_page = filtered_user_map_count - maps_start_position;
 
         for (i = maps_start_position; i < maps_on_page + maps_start_position; i++) {
             int menu_position = (i + 1) - (user_maps_page * 10);
-            string bsp_name = user_maps[i].map_name;
+            int user_map_index = filtered_user_map_indices[i];
+            string bsp_name = user_maps[user_map_index].map_name;
 
             // Build the map strings
             menu_maps_buttons[menu_position - 1] = sprintf("map_%s", bsp_name);
@@ -185,19 +241,19 @@ void() Menu_Maps =
             // official maps in the user maps menu.
             float map_category = MAP_CATEGORY_USER;
             for(int j = 0; j < stock_maps.length; j++) {
-                if (user_maps[i].map_name == stock_maps[j].bsp_name) {
+                if (user_maps[user_map_index].map_name == stock_maps[j].bsp_name) {
                     map_category = stock_maps[j].map_category;
                 }
             }
 
-            Menu_MapButton(menu_position, sprintf("map_%s", bsp_name), bsp_name, map_category, i) ? Menu_Maps_LoadMap(bsp_name) : 0;
+            Menu_MapButton(menu_position, sprintf("map_%s", bsp_name), bsp_name, map_category, user_map_index) ? Menu_Maps_LoadMap(bsp_name) : 0;
         }
 
         int current_registry_position = ((i + 1) - (user_maps_page * 10)) - 1;
 
         Menu_DrawDivider(11.25);
 
-        if (maps_on_page + maps_start_position < user_maps_count) {
+        if (maps_on_page + maps_start_position < filtered_user_map_count) {
             menu_maps_buttons[current_registry_position] = "map_usernext";
             current_registry_position++;
             Menu_Button(-3, "map_usernext", "NEXT PAGE", "Advance to next User Map page.") ? Menu_Maps_NextPage() : 0;
