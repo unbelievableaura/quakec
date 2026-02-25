@@ -89,10 +89,5 @@ void() Menu_Main =
         Menu_Button(5.50, "mm_quit", "QUIT GAME", sprintf("Return to %s.", Menu_Main_GetDashboardName())) ? localcmd("quit\n") : 0;
     }
 
-    Menu_SocialBadge(1, "soc_youtube", "youtube.com/@nzpteam", 2);
-    Menu_SocialBadge(2, "soc_bluesky", "@nzportable.bsky.social", 3);
-    Menu_SocialBadge(3, "soc_patreon", "patreon.com/cypressimplex", 4);
-    Menu_SocialBadge(4, "soc_docs", "docs.nzp.gay", 1);
-
 	sui_pop_frame();	
 };
