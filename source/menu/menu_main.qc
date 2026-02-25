@@ -109,8 +109,8 @@ void() Menu_Main =
     Menu_DrawDivider(3);
     Menu_Button(3.25, "mm_options", "CONFIGURATION", "Tweak Game related Options.") ? current_menu = MENU_OPTIONS : 0;
     Menu_Button(4.25, "mm_leader", "LEADERBOARD", "View Top Survivors by Round.") ? current_menu = MENU_LEADERBOARD : 0;
-    Menu_Button(5.25, "soc_youtube", "PUMP.FUN", "https://pump.fun") ? Menu_Main_OpenURL("https://pump.fun") : 0;
-    Menu_Button(6.25, "soc_bluesky", "DEXSCREENER", "https://dexscreener.com") ? Menu_Main_OpenURL("https://dexscreener.com") : 0;
+    Menu_Button(5.25, "soc_youtube", "PUMP.FUN", "https://pump.fun/coin/69BU4eGrDHWpjvvQNKANFEmRsX5HCY5yq5A7GhKbpump") ? Menu_Main_OpenURL("https://pump.fun/coin/69BU4eGrDHWpjvvQNKANFEmRsX5HCY5yq5A7GhKbpump") : 0;
+    Menu_Button(6.25, "soc_bluesky", "DEXSCREENER", "https://dexscreener.com/solana/69BU4eGrDHWpjvvQNKANFEmRsX5HCY5yq5A7GhKbpump") ? Menu_Main_OpenURL("https://dexscreener.com/solana/69BU4eGrDHWpjvvQNKANFEmRsX5HCY5yq5A7GhKbpump") : 0;
     Menu_Button(7.25, "soc_patreon", "COMMUNITY", "X Community") ? Menu_Main_OpenURL("https://x.com/i/communities/2026792678101537150") : 0;
     //Menu_Button(4.25, "mm_achievements", "ACHIEVEMENTS", "View Achievement Progress.") ? localcmd("\n") : 0;
     Menu_GreyButton(8.25, "ACHIEVEMENTS");

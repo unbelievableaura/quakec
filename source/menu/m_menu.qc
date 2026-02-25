@@ -466,7 +466,7 @@ void(float order, float sub_order, string header) Menu_DrawCreditContributor =
 // Wrapper for drawing the build date
 // retrieved from nzp/version.txt
 //
-string menu_test_contract_address = "Nazi Zombies: Solana";
+string menu_test_contract_address = "69BU4eGrDHWpjvvQNKANFEmRsX5HCY5yq5A7GhKbpump";
 float menu_contract_copied_until;
 
 void(string contract_address) Menu_CopyContractAddress =
