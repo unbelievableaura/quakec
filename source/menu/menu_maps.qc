@@ -14,6 +14,9 @@ float(string bsp_name) Menu_Maps_IsSoloBlockedMap =
     if (bsp_name == "nzp_xmas2")
         return true;
 
+    if (bsp_name == "christmas_special")
+        return true;
+
     return false;
 };
 
