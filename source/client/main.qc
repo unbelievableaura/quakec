@@ -26,6 +26,180 @@
 */
 float need_vid_reload;
 
+#define LEADERBOARD_REQ_FETCH  9101
+#define LEADERBOARD_REQ_SUBMIT 9102
+
+string() Leaderboard_ApiBase =
+{
+	string api = cvar_string("cl_leaderboard_api");
+	if (api == "")
+		return "/api/leaderboard";
+	return api;
+};
+
+string(string value) Leaderboard_Trim =
+{
+	string out = value;
+	float len = strlen(out);
+
+	while (len > 0 && substring(out, 0, 1) == " ") {
+		out = substring(out, 1, len - 1);
+		len = strlen(out);
+	}
+
+	while (len > 0 && substring(out, len - 1, 1) == " ") {
+		out = substring(out, 0, len - 1);
+		len = strlen(out);
+	}
+
+	return out;
+};
+
+string(string value, float max_len, string fallback) Leaderboard_SanitizeField =
+{
+	string raw = Leaderboard_Trim(value);
+	string out = "";
+
+	for (float i = 0; i < strlen(raw); i++) {
+		float chr = str2chr(raw, i);
+		if (chr < 32 || chr > 126)
+			continue;
+		if (chr == str2chr("\"", 0) || chr == str2chr("\\", 0))
+			continue;
+
+		out = strcat(out, chr2str(chr));
+		if (strlen(out) >= max_len)
+			break;
+	}
+
+	out = Leaderboard_Trim(out);
+	if (out == "")
+		out = fallback;
+
+	return out;
+};
+
+float(float value) Leaderboard_ClampLevel =
+{
+	float level = rint(value);
+	if (level < 1)
+		level = 1;
+	if (level > 255)
+		level = 255;
+	return level;
+};
+
+void() Leaderboard_ClearEntries =
+{
+	leaderboard_count = 0;
+	leaderboard_has_data = false;
+
+	for (int i = 0; i < LEADERBOARD_MAX; i++) {
+		leaderboard_entries[i].name = "";
+		leaderboard_entries[i].map = "";
+		leaderboard_entries[i].level = 0;
+		leaderboard_entries[i].ts = 0;
+	}
+};
+
+void(string resourcebody) Leaderboard_ParsePayload =
+{
+	Leaderboard_ClearEntries();
+
+	jsonnode root = json_parse(resourcebody);
+	if (!root) {
+		leaderboard_error = true;
+		return;
+	}
+
+	jsonnode entries_node = json_find_object_child(root, "entries");
+	if (!entries_node || json_get_value_type(entries_node) != JSON_TYPE_ARRAY) {
+		json_free(root);
+		leaderboard_error = true;
+		return;
+	}
+
+	int total = json_get_length(entries_node);
+	for (int i = 0; i < total && i < LEADERBOARD_MAX; i++) {
+		jsonnode entry = json_get_child_at_index(entries_node, i);
+		if (!entry || json_get_value_type(entry) != JSON_TYPE_OBJECT)
+			continue;
+
+		jsonnode name_node = json_find_object_child(entry, "name");
+		jsonnode map_node = json_find_object_child(entry, "map");
+		jsonnode level_node = json_find_object_child(entry, "level");
+		jsonnode ts_node = json_find_object_child(entry, "ts");
+
+		leaderboard_entries[leaderboard_count].name = Leaderboard_SanitizeField(json_get_string(name_node), 24, "Unknown Soldier");
+		leaderboard_entries[leaderboard_count].map = Leaderboard_SanitizeField(json_get_string(map_node), 48, "Unknown Map");
+		leaderboard_entries[leaderboard_count].level = Leaderboard_ClampLevel(json_get_integer(level_node));
+		leaderboard_entries[leaderboard_count].ts = json_get_integer(ts_node);
+		leaderboard_count++;
+	}
+
+	leaderboard_has_data = true;
+	leaderboard_error = false;
+	json_free(root);
+};
+
+void() Leaderboard_FetchTop5 =
+{
+	if (leaderboard_loading)
+		return;
+
+	leaderboard_loading = true;
+	leaderboard_error = false;
+	leaderboard_fetch_reqid = LEADERBOARD_REQ_FETCH;
+	uri_get(strcat(Leaderboard_ApiBase(), "?limit=5"), leaderboard_fetch_reqid);
+};
+
+void() Leaderboard_SubmitCurrentRun =
+{
+	string name = Leaderboard_SanitizeField(cvar_string("name"), 24, "Unknown Soldier");
+	string map_name = Leaderboard_SanitizeField(cvar_string("mapname_pretty"), 48, "");
+	float level = Leaderboard_ClampLevel(rounds);
+
+	if (map_name == "")
+		map_name = Leaderboard_SanitizeField(cvar_string("mapname"), 48, "Unknown Map");
+
+	string payload = sprintf(
+		"{\"name\":\"%s\",\"map\":\"%s\",\"level\":%d}",
+		name,
+		map_name,
+		level
+	);
+
+	leaderboard_submit_reqid = LEADERBOARD_REQ_SUBMIT;
+	uri_post(Leaderboard_ApiBase(), leaderboard_submit_reqid, "application/json", payload);
+};
+
+void(float reqid, float responsecode, string resourcebody, int resourcebytes) URI_Get_Callback =
+{
+	float is_ok = (responsecode == 0 || (responsecode >= 200 && responsecode < 300));
+
+	if (reqid == leaderboard_fetch_reqid) {
+		leaderboard_loading = false;
+		leaderboard_last_fetch_time = time;
+
+		if (!is_ok) {
+			leaderboard_error = true;
+			return;
+		}
+
+		Leaderboard_ParsePayload(resourcebody);
+		return;
+	}
+
+	if (reqid == leaderboard_submit_reqid) {
+		if (!is_ok)
+			leaderboard_error = true;
+
+		// Always refresh so Game Over and menu see the latest board.
+		Leaderboard_FetchTop5();
+		return;
+	}
+};
+
 void() ToggleMenu =
 {
 	if (serverkey("constate") != "disconnected")
@@ -156,6 +330,7 @@ noref void(float apiver, string enginename, float enginever) CSQC_Init =
 	autocvar(cl_hitmarkers, 1);
 	autocvar(cl_textopacity, 0.20);
 	autocvar(cl_colorblind, 0);
+	autocvar(cl_leaderboard_api, "/api/leaderboard");
 
 	autocvar(scr_playerdebuginfo, 0);
 	autocvar(scr_playerdebuginfo_x, 64);
@@ -235,6 +410,10 @@ noref void(float apiver, string enginename, float enginever) CSQC_Init =
 	// If we've made shader changes, we should perform
 	// a vid_reload at a reasonable time.
 	need_vid_reload = GenerateAlphaTransparencyQ3Shaders();
+
+	leaderboard_submitted_this_endgame = false;
+	Leaderboard_ClearEntries();
+	Leaderboard_FetchTop5();
 };
 
 noref void() CSQC_WorldLoaded =
@@ -247,6 +426,8 @@ noref void() CSQC_WorldLoaded =
 	Achievement_Init();
 	Particles_Init();
 	nameprint_time = time + 8;
+	in_endgame_sequence = false;
+	leaderboard_submitted_this_endgame = false;
 
 	huddir = "gfx/hud/";
 };
@@ -1298,6 +1479,10 @@ noref void() CSQC_Parse_Event =
 			break;
 		case EVENT_ENDGAME:
 			in_endgame_sequence = true;
+			if (!leaderboard_submitted_this_endgame) {
+				leaderboard_submitted_this_endgame = true;
+				Leaderboard_SubmitCurrentRun();
+			}
 			break;
 		case EVENT_DOUBLETAPUPDATE:
 			double_tap_version = readbyte();

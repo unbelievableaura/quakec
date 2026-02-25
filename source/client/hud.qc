@@ -1923,6 +1923,46 @@ void() HUD_Endgame = {
 	HUD_DrawStringWithBackdrop([g_width/2 - survive_width/2, 135], survive, [18, 18], [1, 1, 1], 1, 0);
 }
 
+void() HUD_DrawLeaderboardTop5 =
+{
+	float panel_width = 520;
+	float panel_height = 150;
+	float panel_x = g_width / 2 - panel_width / 2;
+	float panel_y = 170;
+
+	drawfill([panel_x, panel_y], [panel_width, panel_height], [0, 0, 0], 0.76, 0);
+	drawfill([panel_x, panel_y], [panel_width, 2], [0.25, 0.25, 0.25], 1, 0);
+
+	HUD_DrawStringWithBackdrop([panel_x + 10, panel_y + 8], "LEADERBOARD (TOP 5)", [12, 12], [1, 1, 0], 1, 0);
+	HUD_DrawStringWithBackdrop([panel_x + 34, panel_y + 24], "NAME", [10, 10], [1, 1, 0], 1, 0);
+	HUD_DrawStringWithBackdrop([panel_x + 228, panel_y + 24], "MAP", [10, 10], [1, 1, 0], 1, 0);
+	HUD_DrawStringWithBackdrop([panel_x + 470, panel_y + 24], "LEVEL", [10, 10], [1, 1, 0], 1, 0);
+
+	for (int i = 0; i < LEADERBOARD_MAX; i++) {
+		float row_y = panel_y + 42 + (i * 20);
+		string row_name = "---";
+		string row_map = "---";
+		string row_level = "---";
+
+		if (i < leaderboard_count) {
+			row_name = leaderboard_entries[i].name;
+			row_map = leaderboard_entries[i].map;
+			row_level = ftos(leaderboard_entries[i].level);
+		}
+
+		HUD_DrawStringWithBackdrop([panel_x + 10, row_y], sprintf("%d.", i + 1), [10, 10], [0.85, 0.85, 0.85], 1, 0);
+		HUD_DrawStringWithBackdrop([panel_x + 34, row_y], substring(row_name, 0, 24), [10, 10], [1, 1, 1], 1, 0);
+		HUD_DrawStringWithBackdrop([panel_x + 228, row_y], substring(row_map, 0, 28), [10, 10], [1, 1, 1], 1, 0);
+		HUD_DrawStringWithBackdrop([panel_x + 480, row_y], row_level, [10, 10], [1, 1, 1], 1, 0);
+	}
+
+	if (leaderboard_loading) {
+		HUD_DrawStringWithBackdrop([panel_x + 10, panel_y + panel_height - 18], "Refreshing leaderboard...", [10, 10], [1, 1, 1], 1, 0);
+	} else if (leaderboard_error) {
+		HUD_DrawStringWithBackdrop([panel_x + 10, panel_y + panel_height - 18], "Leaderboard unavailable.", [10, 10], [1, 0.7, 0.7], 1, 0);
+	}
+}
+
 //
 // HUD_Screenflash()
 // Screen fade in and out behaviors.
@@ -2355,6 +2395,7 @@ void() HUD_DrawElementsForEndGame =
 {
 	// Draws our "GAME OVER" text.
 	HUD_Endgame();
+	HUD_DrawLeaderboardTop5();
 
 	// Draws the scoreboard.
 	HUD_Scores();

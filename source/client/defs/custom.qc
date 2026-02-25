@@ -96,6 +96,25 @@ float rounds_change;
 float player_count;
 float score_show;
 
+#define LEADERBOARD_MAX 5
+
+var struct leaderboard_entry_s
+{
+	string name;
+	string map;
+	float level;
+	float ts;
+} leaderboard_entries[LEADERBOARD_MAX];
+
+float leaderboard_count;
+float leaderboard_loading;
+float leaderboard_error;
+float leaderboard_has_data;
+float leaderboard_fetch_reqid;
+float leaderboard_submit_reqid;
+float leaderboard_submitted_this_endgame;
+float leaderboard_last_fetch_time;
+
 #define MAX_ACHIEVEMENTS    42
 
 var struct achievementlist_t

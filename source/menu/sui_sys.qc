@@ -451,6 +451,9 @@ void() _sui_menukey_downarrow =
 		case MENU_GAMESETTINGS:
 			_hover_actions[0] = Menu_GameSettings_GetNextButton(current_hovered_option);
 			break;
+		case MENU_LEADERBOARD:
+			_hover_actions[0] = Menu_Leaderboard_GetNextButton(current_hovered_option);
+			break;
 
 #else
 
@@ -525,6 +528,9 @@ void() _sui_menukey_uparrow =
 			break;
 		case MENU_GAMESETTINGS:
 			_hover_actions[0] = Menu_GameSettings_GetPreviousButton(current_hovered_option);
+			break;
+		case MENU_LEADERBOARD:
+			_hover_actions[0] = Menu_Leaderboard_GetPreviousButton(current_hovered_option);
 			break;
 
 #else

@@ -1,4 +1,4 @@
-string menu_main_buttons[7] = {"mm_start", "mm_coop", "mm_options", "soc_youtube", "soc_bluesky", "soc_patreon", "mm_quit"};
+string menu_main_buttons[8] = {"mm_start", "mm_coop", "mm_options", "mm_leader", "soc_youtube", "soc_bluesky", "soc_patreon", "mm_quit"};
 
 void(string url) Menu_Main_OpenURL =
 {
@@ -90,15 +90,16 @@ void() Menu_Main =
     Menu_Button(2, "mm_coop", "COOPERATIVE", "Play with up to Four Players.") ? current_menu = MENU_COOP : 0;
     Menu_DrawDivider(3);
     Menu_Button(3.25, "mm_options", "CONFIGURATION", "Tweak Game related Options.") ? current_menu = MENU_OPTIONS : 0;
-    Menu_Button(4.25, "soc_youtube", "PUMP.FUN", "https://pump.fun") ? Menu_Main_OpenURL("https://pump.fun") : 0;
-    Menu_Button(5.25, "soc_bluesky", "DEXSCREENER", "https://dexscreener.com") ? Menu_Main_OpenURL("https://dexscreener.com") : 0;
-    Menu_Button(6.25, "soc_patreon", "COMMUNITY", "https://x.com") ? Menu_Main_OpenURL("https://x.com") : 0;
+    Menu_Button(4.25, "mm_leader", "LEADERBOARD", "View Top Survivors by Round.") ? current_menu = MENU_LEADERBOARD : 0;
+    Menu_Button(5.25, "soc_youtube", "PUMP.FUN", "https://pump.fun") ? Menu_Main_OpenURL("https://pump.fun") : 0;
+    Menu_Button(6.25, "soc_bluesky", "DEXSCREENER", "https://dexscreener.com") ? Menu_Main_OpenURL("https://dexscreener.com") : 0;
+    Menu_Button(7.25, "soc_patreon", "COMMUNITY", "https://x.com") ? Menu_Main_OpenURL("https://x.com") : 0;
     //Menu_Button(4.25, "mm_achievements", "ACHIEVEMENTS", "View Achievement Progress.") ? localcmd("\n") : 0;
-    Menu_GreyButton(7.25, "ACHIEVEMENTS");
+    Menu_GreyButton(8.25, "ACHIEVEMENTS");
     // Don't have a Quit Game button on WASM 
     if (running_platform != PLATFORM_WEB) {
-        Menu_DrawDivider(8.25);
-        Menu_Button(8.50, "mm_quit", "QUIT GAME", sprintf("Return to %s.", Menu_Main_GetDashboardName())) ? localcmd("quit\n") : 0;
+        Menu_DrawDivider(9.25);
+        Menu_Button(9.50, "mm_quit", "QUIT GAME", sprintf("Return to %s.", Menu_Main_GetDashboardName())) ? localcmd("quit\n") : 0;
     }
 
 	sui_pop_frame();	

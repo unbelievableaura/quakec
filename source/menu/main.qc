@@ -217,6 +217,7 @@ void() m_init =
 	autocvar(nzp_particles, 1);
 	autocvar(nzp_uivolume, 1);
 	autocvar(nzp_bgmvolume, 1);
+	autocvar(cl_leaderboard_api, "/api/leaderboard");
 	autocvar(vid_ultrawide_limiter, 0);
 	autocvar(cl_hitmarkers, 1);
 	autocvar(cl_textopacity, 0.20);

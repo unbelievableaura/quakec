@@ -932,6 +932,7 @@ void(vector size) root_menu =
 		case MENU_COOPCREATE: Menu_Coop_Create(); break;
 		case MENU_COOPSTOCK: menu_map_mode = MAP_COOPSTOCK; Menu_Maps(); break;
 		case MENU_COOPUSER: menu_map_mode = MAP_COOPUSER; Menu_Maps(); break;
+		case MENU_LEADERBOARD: Menu_Leaderboard(); break;
 		case MENU_CREDITS: Menu_Credits(); break;
 		case MENU_LOBBY: Menu_Lobby(); break;
 		case MENU_GAMESETTINGS: Menu_GameSettings(); break;

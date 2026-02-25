@@ -790,6 +790,27 @@ float(string uril, float id, optional string postmimetype, optional string postd
 		For a GET request, omit the mime+data entirely.
 		Consult your webserver/php/etc documentation for best-practise. */
 
+typedef struct json_s *json_t;
+accessor jsonnode : json_t;
+jsonnode(string) json_parse = #0:json_parse;
+void(jsonnode) json_free = #0:json_free;
+enum json_type_e : int
+{
+	JSON_TYPE_STRING,
+	JSON_TYPE_NUMBER,
+	JSON_TYPE_OBJECT,
+	JSON_TYPE_ARRAY,
+	JSON_TYPE_TRUE,
+	JSON_TYPE_FALSE,
+	JSON_TYPE_NULL
+};
+json_type_e(jsonnode node) json_get_value_type = #0:json_get_value_type;
+int(jsonnode node) json_get_integer = #0:json_get_integer;
+string(jsonnode node) json_get_string = #0:json_get_string;
+jsonnode(jsonnode node, string) json_find_object_child = #0:json_find_object_child;
+int(jsonnode node) json_get_length = #0:json_get_length;
+jsonnode(jsonnode node, int childindex) json_get_child_at_index = #0:json_get_child_at_index;
+
 float(string str) tokenize_console = #514; /*
 		Tokenize a string exactly as the console's tokenizer would do so. The regular tokenize builtin became bastardized for convienient string parsing, which resulted in a large disparity that can be exploited to bypass checks implemented in a naive SV_ParseClientCommand function, therefore you can use this builtin to make sure it exactly matches. */
 

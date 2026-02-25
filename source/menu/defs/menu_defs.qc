@@ -57,6 +57,7 @@ enum {
     MENU_GAMEPAD,
     MENU_BINDINGS,
     MENU_ACCESSIBILITY,
+    MENU_LEADERBOARD,
     MENU_CREDITS,
     MENU_PAUSE,
     MENU_LOBBY,
@@ -80,6 +81,7 @@ void() Menu_Coop_Join;
 void() Menu_Coop_Browse;
 void() Menu_Coop_Direct;
 void() Menu_Coop_Create;
+void() Menu_Leaderboard;
 void() Menu_Credits;
 void() Menu_Lobby;
 void() Menu_GameSettings;
@@ -102,6 +104,9 @@ void() Menu_Accessibility;
 
 string(string prev_id) Menu_Main_GetNextButton;
 string(string next_id) Menu_Main_GetPreviousButton;
+
+string(string prev_id) Menu_Leaderboard_GetNextButton;
+string(string next_id) Menu_Leaderboard_GetPreviousButton;
 
 string(string next_id) Menu_Coop_Browse_GetNextButton;
 string(string next_id) Menu_Coop_Direct_GetNextButton;
