@@ -537,8 +537,11 @@ void() Menu_DrawBackground =
 	sui_fill([0, sui_current_frame_size()[1] - 58], [sui_current_frame_size()[0], 3], [0.2, 0.2, 0.2], 1, 0);
 
 	// Default footer info shown where hover descriptions appear.
-	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_END]);
-	sui_text([0, -30], MENU_TEXT_MEDIUM, strcat("CA: ", menu_test_contract_address), [1, 1, 1], 1, 0);
+	// Hide while anything is hovered so the hovered description has the slot.
+	if (current_menu == MENU_MAIN && _hover_action_count == 0) {
+		sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_END]);
+		sui_text([0, -30], MENU_TEXT_MEDIUM, strcat("CA: ", menu_test_contract_address), [1, 1, 1], 1, 0);
+	}
 };
 
 //
