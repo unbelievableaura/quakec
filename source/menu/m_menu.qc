@@ -493,15 +493,7 @@ void() Menu_DrawBuildDate =
 		Menu_CopyContractAddress(menu_test_contract_address);
 	}
 
-	if (menu_contract_copied_until > time) {
-		sui_text([-6, 22], MENU_TEXT_SUPERSMALL, "Copied contract to clipboard", [1, 1, 0], 1, 0);
-	} else if (contract_hovered) {
-		sui_text([-6, 22], MENU_TEXT_SUPERSMALL, "Click to copy contract address", [1, 1, 0], 1, 0);
-	} else {
-		sui_text([-6, 22], MENU_TEXT_SMALL, build_datetime, [1, 1, 1], 1, 0);
-	}
-
-	sui_text([-6, 36], MENU_TEXT_SMALL, sprintf("Welcome, %s", cvar_string("name")), [1, 1, 0], 1, 0);
+	sui_text([-6, 22], MENU_TEXT_SMALL, sprintf("Welcome, %s", cvar_string("name")), [1, 1, 0], 1, 0);
 };
 
 //
