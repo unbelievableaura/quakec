@@ -1928,7 +1928,10 @@ void() HUD_DrawLeaderboardTop5 =
 	float panel_width = 520;
 	float panel_height = 150;
 	float panel_x = g_width / 2 - panel_width / 2;
-	float panel_y = 170;
+	float panel_y = 360;
+
+	if (panel_y + panel_height > g_height - 20)
+		panel_y = g_height - panel_height - 20;
 
 	drawfill([panel_x, panel_y], [panel_width, panel_height], [0, 0, 0], 0.76, 0);
 	drawfill([panel_x, panel_y], [panel_width, 2], [0.25, 0.25, 0.25], 1, 0);
@@ -2395,10 +2398,12 @@ void() HUD_DrawElementsForEndGame =
 {
 	// Draws our "GAME OVER" text.
 	HUD_Endgame();
-	HUD_DrawLeaderboardTop5();
 
 	// Draws the scoreboard.
 	HUD_Scores();
+
+	// Draw leaderboard after scoreboard so it remains legible.
+	HUD_DrawLeaderboardTop5();
 };
 
 //
