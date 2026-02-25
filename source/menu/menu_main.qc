@@ -2,9 +2,21 @@ string menu_main_buttons[8] = {"mm_start", "mm_coop", "mm_options", "mm_leader",
 
 void(string url) Menu_Main_OpenURL =
 {
-    // Primary web path: open a new tab from a direct click gesture.
+    // Web path: emulate a normal <a target=\"_blank\"> click first, then fall
+    // back to window.open, then same-tab navigation if popup policies block both.
     js_run_script(sprintf(
-        "(function(){var w=window.open('%s','_blank','noopener,noreferrer');if(w){w.opener=null;}})();",
+        "(function(){"
+        "var u='%s';"
+        "try{"
+        "var a=document.createElement('a');"
+        "a.href=u;a.target='_blank';a.rel='noopener noreferrer';a.style.display='none';"
+        "document.body.appendChild(a);a.click();"
+        "setTimeout(function(){if(a&&a.parentNode)a.parentNode.removeChild(a);},0);"
+        "}catch(_e){}"
+        "var w=window.open(u,'_blank','noopener,noreferrer');"
+        "if(w){try{w.opener=null;}catch(_e2){}return;}"
+        "window.location.assign(u);"
+        "})();",
         url
     ));
 
