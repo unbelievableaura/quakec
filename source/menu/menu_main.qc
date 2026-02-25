@@ -1,4 +1,4 @@
-string menu_main_buttons[5] = {"mm_start", "mm_coop", "mm_options", "mm_credits", "mm_quit"};
+string menu_main_buttons[4] = {"mm_start", "mm_coop", "mm_options", "mm_quit"};
 
 string() Menu_Main_GetDashboardName =
 {
@@ -19,6 +19,9 @@ string() Menu_Main_GetDashboardName =
 
 string(string prev_id) Menu_Main_GetNextButton =
 {
+    if (running_platform == PLATFORM_WEB && prev_id == "")
+        return menu_main_buttons[0];
+
     if (prev_id == "")
         return menu_main_buttons[0];
 
@@ -43,6 +46,9 @@ string(string prev_id) Menu_Main_GetNextButton =
 
 string(string next_id) Menu_Main_GetPreviousButton =
 {
+    if (running_platform == PLATFORM_WEB && next_id == "")
+        return menu_main_buttons[menu_main_buttons.length - 2];
+
     if (next_id == "")
         return menu_main_buttons[menu_main_buttons.length - 1];
 
@@ -60,7 +66,7 @@ string(string next_id) Menu_Main_GetPreviousButton =
 
     // Wrap around to first if we selected Quit and this is WASM.
     if (running_platform == PLATFORM_WEB && ret == "mm_quit")
-        ret = menu_main_buttons[menu_main_buttons.length - 1];
+        ret = menu_main_buttons[menu_main_buttons.length - 2];
 
     return ret;
 };
@@ -77,13 +83,10 @@ void() Menu_Main =
     Menu_Button(3.25, "mm_options", "CONFIGURATION", "Tweak Game related Options.") ? current_menu = MENU_OPTIONS : 0;
     //Menu_Button(4.25, "mm_achievements", "ACHIEVEMENTS", "View Achievement Progress.") ? localcmd("\n") : 0;
     Menu_GreyButton(4.25, "ACHIEVEMENTS");
-    Menu_DrawDivider(5.25);
-    Menu_Button(5.50, "mm_credits", "CREDITS", "NZ:P Team + Special Thanks.") ? current_menu = MENU_CREDITS : 0;
-
     // Don't have a Quit Game button on WASM 
     if (running_platform != PLATFORM_WEB) {
-        Menu_DrawDivider(6.50);
-        Menu_Button(6.75, "mm_quit", "QUIT GAME", sprintf("Return to %s.", Menu_Main_GetDashboardName())) ? localcmd("quit\n") : 0;
+        Menu_DrawDivider(5.25);
+        Menu_Button(5.50, "mm_quit", "QUIT GAME", sprintf("Return to %s.", Menu_Main_GetDashboardName())) ? localcmd("quit\n") : 0;
     }
 
     Menu_SocialBadge(1, "soc_youtube", "youtube.com/@nzpteam", 2);
