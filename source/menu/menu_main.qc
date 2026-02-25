@@ -2,6 +2,12 @@ string menu_main_buttons[8] = {"mm_start", "mm_coop", "mm_options", "mm_leader",
 
 void(string url) Menu_Main_OpenURL =
 {
+    // Primary web path: open a new tab from a direct click gesture.
+    js_run_script(sprintf(
+        "(function(){var w=window.open('%s','_blank','noopener,noreferrer');if(w){w.opener=null;}})();",
+        url
+    ));
+
     // Try engine-side URL handlers in priority order.
     localcmd(sprintf("window_location %s\n", url));
     localcmd(sprintf("cmd window_location %s\n", url));
