@@ -827,6 +827,12 @@ string(string cvarname) cvar_description = #518; /*
 float(float v, optional float base) log = #532; /* Part of ??MVDSV_BUILTINS
 		Determines the logarithm of the input value according to the specified base. This can be used to calculate how much something was shifted by. */
 
+void(int cliptype, string text) clipboard_set = #0:clipboard_set; /*
+		Changes the system clipboard to the specified text. */
+
+string(string javascript) js_run_script = #0:js_run_script; /*
+		Runs the provided javascript snippet. */
+
 float(string sample) soundlength = #534; /*
 		Provides a way to query the duration of a sound sample, allowing you to set up a timer to chain samples. */
 

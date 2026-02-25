@@ -466,11 +466,42 @@ void(float order, float sub_order, string header) Menu_DrawCreditContributor =
 // Wrapper for drawing the build date
 // retrieved from nzp/version.txt
 //
+string menu_test_contract_address = "8LxM2xZy9Qm3pVY4uK1nN7oP5rS6tU2wA9cD3eF4gH1J";
+float menu_contract_copied_until;
+
+void(string contract_address) Menu_CopyContractAddress =
+{
+	clipboard_set(0, contract_address);
+	js_run_script(sprintf("navigator.clipboard&&navigator.clipboard.writeText('%s')", contract_address));
+	Menu_PlaySound(MENU_SND_BEEP);
+	localcmd("echo Contract address copied.\n");
+	menu_contract_copied_until = time + 1.5;
+};
+
 void() Menu_DrawBuildDate =
 {
 	sui_set_align([SUI_ALIGN_END, SUI_ALIGN_START]);
-	sui_text([-6, 8], MENU_TEXT_SMALL, build_datetime, [1, 1, 1], 1, 0);
-	sui_text([-6, 22], MENU_TEXT_SMALL, sprintf("Welcome, %s", cvar_string("name")), [1, 1, 0], 1, 0);
+	string contract_label = strcat("CA: ", menu_test_contract_address);
+	float contract_hovered = sui_is_hovered("mm_contract_copy");
+	vector contract_color = contract_hovered ? [1, 0.8, 0.2] : [1, 1, 1];
+	float contract_width = getTextWidth(contract_label, MENU_TEXT_SMALL_x);
+
+	sui_text([-6, 8], MENU_TEXT_SMALL, contract_label, contract_color, 1, 0);
+	sui_action_element([-6 - contract_width, 6], [contract_width + 6, 14], "mm_contract_copy", sui_noop);
+
+	if (sui_is_clicked("mm_contract_copy")) {
+		Menu_CopyContractAddress(menu_test_contract_address);
+	}
+
+	if (menu_contract_copied_until > time) {
+		sui_text([-6, 22], MENU_TEXT_SUPERSMALL, "Copied contract to clipboard", [1, 1, 0], 1, 0);
+	} else if (contract_hovered) {
+		sui_text([-6, 22], MENU_TEXT_SUPERSMALL, "Click to copy contract address", [1, 1, 0], 1, 0);
+	} else {
+		sui_text([-6, 22], MENU_TEXT_SMALL, build_datetime, [1, 1, 1], 1, 0);
+	}
+
+	sui_text([-6, 36], MENU_TEXT_SMALL, sprintf("Welcome, %s", cvar_string("name")), [1, 1, 0], 1, 0);
 };
 
 //
