@@ -189,8 +189,7 @@ void() Menu_Coop_Join =
 
 	Menu_DrawTitle("JOIN GAME");
 
-	Menu_Button(1, "cjm_browse", "BROWSE SERVERS", "Browse the list of active Servers.") ? current_menu = MENU_COOPBROWSE : 0;
-	Menu_Button(2, "cjm_direct", "DIRECT IP/ID", "Connect directly to an active Server.") ? current_menu = MENU_COOPDIRECT : 0;
+	Menu_Button(1, "cjm_direct", "DIRECT IP/ID", "Connect directly to an active Server.") ? current_menu = MENU_COOPDIRECT : 0;
 
 	Menu_Button(-1, "cjm_back", "BACK", "Return to Co-Op Menu.") ? current_menu = MENU_COOP : 0;
 
@@ -278,7 +277,7 @@ string menu_coop_direct_buttons[] = {
 };
 
 string menu_coop_join_buttons[] = {
-	"cjm_browse", "cjm_direct", "cjm_back"
+	"cjm_direct", "cjm_back"
 };
 
 string menu_coop_create_buttons[] = {
