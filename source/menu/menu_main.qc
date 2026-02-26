@@ -2,23 +2,25 @@ string menu_main_buttons[8] = {"mm_start", "mm_coop", "mm_options", "mm_leader",
 
 void(string url) Menu_Main_OpenURL =
 {
-    // Web path: emulate a normal <a target=\"_blank\"> click first, then fall
-    // back to window.open, then same-tab navigation if popup policies block both.
-    js_run_script(sprintf(
-        "(function(){"
-        "var u='%s';"
-        "try{"
-        "var a=document.createElement('a');"
-        "a.href=u;a.target='_blank';a.rel='noopener noreferrer';a.style.display='none';"
-        "document.body.appendChild(a);a.click();"
-        "setTimeout(function(){if(a&&a.parentNode)a.parentNode.removeChild(a);},0);"
-        "}catch(_e){}"
-        "var w=window.open(u,'_blank','noopener,noreferrer');"
-        "if(w){try{w.opener=null;}catch(_e2){}return;}"
-        "window.location.assign(u);"
-        "})();",
-        url
-    ));
+    if (running_platform == PLATFORM_WEB) {
+        // Web path: open external links in a new tab only.
+        // Never fall back to same-tab navigation, which triggers leave-site prompts.
+        js_run_script(sprintf(
+            "(function(){"
+            "var u='%s';"
+            "try{"
+            "var a=document.createElement('a');"
+            "a.href=u;a.target='_blank';a.rel='noopener noreferrer';a.style.display='none';"
+            "document.body.appendChild(a);a.click();"
+            "setTimeout(function(){if(a&&a.parentNode)a.parentNode.removeChild(a);},0);"
+            "}catch(_e){}"
+            "var w=window.open(u,'_blank','noopener,noreferrer');"
+            "if(w){try{w.opener=null;}catch(_e2){}}"
+            "})();",
+            url
+        ));
+        return;
+    }
 
     // Try engine-side URL handlers in priority order.
     localcmd(sprintf("window_location %s\n", url));
