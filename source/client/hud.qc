@@ -1785,8 +1785,6 @@ void() HUD_Scores =
 	
 	if(serverkey("constate") != "disconnected")
 	{
-		Draw_String([5, g_height - scoreboard_text_size - 5], sprintf("Nazi Zombies: Portable %s", build_datetime), [scoreboard_text_size, scoreboard_text_size], TEXTCOLOR, 1, 0);
-
 		// Scoreboard header
 		drawfill([g_width/2 - 271, 177], [270 * 2 + 2, 1], [0.2, 0.2, 0.2], 1, 0);
 		drawfill([g_width/2 - 271, 178 + scoreboard_text_size + 4], [270 * 2 + 2, 1], [0.2, 0.2, 0.2], 1, 0);
@@ -1961,8 +1959,6 @@ void() HUD_DrawLeaderboardTop5 =
 
 	if (leaderboard_loading) {
 		HUD_DrawStringWithBackdrop([panel_x + 10, panel_y + panel_height - 18], "Refreshing leaderboard...", [10, 10], [1, 1, 1], 1, 0);
-	} else if (leaderboard_error) {
-		HUD_DrawStringWithBackdrop([panel_x + 10, panel_y + panel_height - 18], "Leaderboard unavailable.", [10, 10], [1, 0.7, 0.7], 1, 0);
 	}
 }
 
